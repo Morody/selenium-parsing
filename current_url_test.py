@@ -48,7 +48,7 @@ ActionChains(driver).click(searchListObj).perform()
 
 time.sleep(20)
 
-firstObj = driver.find_element(By.XPATH, "//table[@id='tableview-1175-record-44113']")
+firstObj = driver.find_element(By.XPATH, "//table[@id='tableview-1175-record-44113']") # id записей постоянно обновляются, нужно менять
 ActionChains(driver).click(firstObj).perform()
 
 time.sleep(5)
@@ -58,7 +58,7 @@ ActionChains(driver).click(focusOnMap).perform()
 
 time.sleep(5)
 
-ActionChains(driver).move_to_element_with_offset(focusOnMap,-423,15).perform()
+ActionChains(driver).move_to_element_with_offset(focusOnMap,-423,15).perform() # в зависимости от экрана нужно менять координаты
 
 time.sleep(5)
 
@@ -68,7 +68,7 @@ print(searchCoordinate.text)
 
 time.sleep(5)
 
-firstObjId = driver.find_element(By.XPATH, "//table[@id='tableview-1175-record-44113']/tbody/tr/td") 
+firstObjId = driver.find_element(By.XPATH, "//table[@id='tableview-1175-record-44113']/tbody/tr/td") # id записей постоянно обновляются, нужно менять
 
 print(firstObjId.text)
 
