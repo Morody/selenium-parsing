@@ -3,6 +3,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.chrome.service import Service
+import pandas as pd
 from bs4 import BeautifulSoup
 import warnings
 warnings.filterwarnings('ignore')
@@ -48,30 +49,43 @@ ActionChains(driver).click(searchListObj).perform()
 
 time.sleep(20)
 
-firstObj = driver.find_element(By.XPATH, "//table[@id='tableview-1175-record-44113']") # id записей постоянно обновляются, нужно менять
-ActionChains(driver).click(firstObj).perform()
+resTable = pd.DataFrame({
+    'Name and ID': [],
+    'Coordinates': []
+})
 
-time.sleep(5)
 
-focusOnMap = driver.find_element(By.CSS_SELECTOR, 'a#PanMapByCurrRpGrListObjBtn')
-ActionChains(driver).click(focusOnMap).perform()
+for i in range(0, 5):
 
-time.sleep(5)
 
-ActionChains(driver).move_to_element_with_offset(focusOnMap,-423,15).perform() # в зависимости от экрана нужно менять координаты
+    OnetObj = driver.find_elements(By.XPATH, f"//div[@id='mwRightPanelGrid-body']//table[@data-recordindex='{i}']//td")[0]
 
-time.sleep(5)
+    ActionChains(driver).click(OnetObj).perform()
 
-searchCoordinate = driver.find_element(By.CSS_SELECTOR, 'div.custom-mouse-position')
+    time.sleep(2)
 
-print(searchCoordinate.text)
+    focusOnMap = driver.find_element(By.CSS_SELECTOR, 'a#PanMapByCurrRpGrListObjBtn')
+    ActionChains(driver).click(focusOnMap).perform()
 
-time.sleep(5)
+    time.sleep(5)
 
-firstObjId = driver.find_element(By.XPATH, "//table[@id='tableview-1175-record-44113']/tbody/tr/td") # id записей постоянно обновляются, нужно менять
+    ActionChains(driver).move_to_element_with_offset(focusOnMap,-423,15).perform() # в зависимости от экрана нужно менять координаты
 
-print(firstObjId.text)
+    time.sleep(5)
 
-time.sleep(5)
+    searchCoordinate = driver.find_element(By.CSS_SELECTOR, 'div.custom-mouse-position')
+    
+    tempData = pd.DataFrame({
+        "Name and ID": [OnetObj.text],
+        "Coordinates": [searchCoordinate.text]
+    })
+
+    resTable = resTable._append(tempData)
+
+    ActionChains(driver).click(OnetObj).send_keys(Keys.PAGE_DOWN).perform()
+
+    time.sleep(5)
 
 driver.close()
+
+resTable.to_excel('data.xlsx')
