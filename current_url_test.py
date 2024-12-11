@@ -44,6 +44,11 @@ ActionChains(driver).double_click(searchCheckBox).perform()
 
 time.sleep(5)
 
+ButClose = driver.find_element(By.XPATH, "//div[@data-componentid='tool-1307']")
+ActionChains(driver).click(ButClose).perform()
+
+time.sleep(5)
+
 searchListObj = driver.find_element(By.CSS_SELECTOR, 'a#BuildRListForPlugLayerBtn')
 ActionChains(driver).click(searchListObj).perform()
 
