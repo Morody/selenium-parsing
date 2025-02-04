@@ -63,7 +63,7 @@ resTable = pd.DataFrame({
 })
 
 
-for i in range(0, 1000):
+for i in range(0, 50):
 
 
     OneObj = driver.find_elements(By.XPATH, f"//div[@id='mwRightPanelGrid-body']//table[@data-recordindex='{i}']")[0]
@@ -90,7 +90,13 @@ for i in range(0, 1000):
     sign_obj = driver.find_elements(By.XPATH, f"//div[@id='windowObjectInfo']//div[@class='x-grid-item-container']//table[@data-recordindex='3']//td")[1]
     
     ActionChains(driver).move_to_element_with_offset(OneObj,-423,15).perform() # в зависимости от экрана нужно менять координаты
+    
+    time.sleep(2)
+
+    
     coordinate_obj = driver.find_element(By.CSS_SELECTOR, 'div.custom-mouse-position')
+
+    time.sleep(2)
 
     coord = re.search(r'Y\:\s\d*\.\d*\;\sX:\s\d*\.\d*', coordinate_obj.text).group(0)
 
@@ -106,7 +112,8 @@ for i in range(0, 1000):
 
     ActionChains(driver).click(OneObj).send_keys(Keys.PAGE_DOWN).perform()
 
-    time.sleep(5)
+    print(i)
+    print(id_obj.text, coord, sep=" ")
 
 driver.close()
 
