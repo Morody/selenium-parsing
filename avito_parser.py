@@ -16,24 +16,14 @@ options.add_argument("--start-maximized")
 
 driver = webdriver.Chrome(options=options)
 url = 'https://www.avito.ru/kazan/kvartiry/prodam/novostroyka-ASgBAgICAkSSA8YQ5geOUg?context=H4sIAAAAAAAA_wEtANL_YToxOntzOjg6ImZyb21QYWdlIjtzOjE2OiJzZWFyY2hGb3JtV2lkZ2V0Ijt9F_yIfi0AAAA'
+
+str = 'https://geocode-maps.yandex.ru/1.x/?apikey=8a764659-98c0-4eb9-8683-ef1591e7db86&geocode=Дубай, бульвар Мухаммед Бин Рашид, дом 1&format=json'
+
 driver.get(url)
 
 resTable = pd.DataFrame({
-    'Комнаты': [],
-    'Площадь': [],
-    'Этаж': [],
-    'Цена': [],
-    'Цена за м2': [],
-    'Акции': [],
-    'Продавец': [],
-    'Нежилая площадь': [],
-    'Улица': [],
-    'Район': [],
-    'Близость к станции метро': [],
-    'Описание': [],
-    'Застройщик': [],
-    'Объявления': [],
-    'Реквизиты': []
+    'Цена за м2' : [],
+    'Координаты' : []
 })
 
 #ads_count = driver.find_element(By.XPATH, "//span[@data-marker='page-title/count']").text.replace(' ','') # количество объявлений
@@ -48,7 +38,7 @@ for page in range(1, 2):
 
     for ad in ads_elements:
         #resTable.add(ad.text.split('\n'))
-        print(len(ad.text.split('\n')))
+        print(ad.text)
         
 
 
