@@ -1,0 +1,7 @@
+selenium==4.27.1
+requests==2.31.0
+pandas==2.2.1
+lxml
+openpyxl
+ischedule==1.2.7
+XlsxWriter==3.2.0
