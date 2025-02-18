@@ -12,6 +12,7 @@ import re
 import math
 import ischedule
 from datetime import datetime
+import json
 
 def myFunc():
     options = webdriver.ChromeOptions()
@@ -53,35 +54,41 @@ def myFunc():
     for i in df_dict.keys():
     	num_curr_recs += df_dict[i].shape[0]
 
-    start_page = math.ceil(num_curr_recs / 50) if (num_curr_recs // 50) != 0 else 1 # количество объявлений уже записанных в таблице делим на 50 тем самым определяем стартовую страницу для сбора данных на текущей итерации
+    start_page = 0 
     
+    if ((num_curr_recs // 50) == 0):
+        start_page = 1
+    elif ((num_curr_recs // 50) > 0 and (num_curr_recs // 50) < 1):
+        start_page = 2
+    else:
+        start_page = math.ceil(num_curr_recs / 50) # количество объявлений уже записанных в таблице делим на 50 тем самым определяем стартовую страницу для сбора данных на текущей итерации
+
     for page in range(start_page, start_page + 20): # увеличивать на 20, т.к есть ограничение на запросы ~1000, 1 страница с Авито = 50 объявлений, 20 стр. = ~1000
-        count = 0 # счетчик количества собранных объявлений со страницы
         driver.get(f'{url}&p{page}')
         driver.implicitly_wait(3)    
         ads_elements = driver.find_elements(by=By.XPATH, 
                                             value='//div[@data-marker="item"]')
+        ads_c = 0 # счетчик количества собранных объявлений со страницы
         for ad in ads_elements:
-            
             priceSquare = re.search(r'[ \d]+ ₽ за м²', ad.text)
             address = re.search(r'(?:ул. [А-Яа-яёЁ0-9,.\-\/ ]+|пр-т [А-Яа-яёЁ0-9,.\-\/ ]+)', ad.text)
-            if (address is None):
-                pass
+            #print(address)
+            if (address is None): # любой другой адрес, который не начинается на ул. или пр-т - пропускаются, т.к. это скорее всего будет пригород
+                continue
             else:
                 response = requests.get(f'https://geocode-maps.yandex.ru/1.x/?apikey=8a764659-98c0-4eb9-8683-ef1591e7db86&geocode=Казань, {address[0]}, &format=json')
-                count += 1
+                if (json.loads(response.text)['message'] == 'Limit is exceeded'): # response.message == 'Limit is exceeded' в том случаю, когда заканчиваются запросы. Ограничение 1000 запросов в сутки
+                    break
                 InBetweenRes = re.search(r'pos[\d\"\.\: ]+}', response.text)
                 ListPos = re.search(r'[\d\. ]+', InBetweenRes[0])[0].split(' ')
-    
+                ads_c += 1
                 temp_data = pd.DataFrame({
                 'Цена за м2' : [priceSquare[0]],
                 'Координаты' : [f'{ListPos[1]} {ListPos[0]}']
                 })
     
                 res_table = res_table._append(temp_data)
-    
-    
-        print(f"Страница {page} готова, количество собранных объявлений:{count}")
+        print(f"Страница {page} готова, количество собранных объявлений:{ads_c}")
      
     if (sheet_name in df_dict.keys()):
     	fin_data = pd.concat([
@@ -101,6 +108,6 @@ def myFunc():
     							df_dict[sheet_name].to_excel(excel_writer, sheet_name=sheet_name, index=False)
          
     driver.close()
-
+myFunc() # начальный запуск, дальше запускается по раписанию, через сутки
 ischedule.schedule(myFunc, interval=60*60*24) # сутки в секундах 60*60*24
 ischedule.run_loop()
